@@ -1,12 +1,13 @@
 import { useDispatch, useSelector } from "react-redux";
 import { ContainerSearch, Title, Input } from "./Filter.styled";
-import { filter } from "../Redux/contactsSlice";
+import { filter, getFilter } from "components/Redux/contactsSlice";
 
 const Filter = () => {
     const dispatch = useDispatch();
-    const value = useSelector((state) => state.contacts.filter);
+    const value = useSelector(getFilter);
+
     const onChange = (event) => {
-        dispatch(filter(event.currentTarget.value.toLowerCase()));
+        dispatch(filter(event.currentTarget.value.toLocaleLowerCase().trim()));
     };
 
     return (

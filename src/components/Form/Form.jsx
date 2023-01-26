@@ -1,24 +1,20 @@
 import { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { nanoid } from 'nanoid';
+import { useGetContactsQuery, useCreateContactMutation } from 'components/Redux/contactsApi';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
-import Input from '../Input';
-import { add, getContactsState } from '../Redux/contactsSlice';
+import Input from 'components/Input';
 import { FormContainer, ButtonSubmit } from "./Form.styled";
+import { TailSpin } from 'react-loader-spinner';
 
 const Form = () => {
+    const [createContact, { isLoading }] = useCreateContactMutation();
+    const { data: contacts } = useGetContactsQuery();
     const [name, setName] = useState("");
     const [number, setNumber] = useState("");
-    const [id, setId] = useState("");
-
-    const contacts = useSelector(getContactsState);
-    const dispatch = useDispatch();
 
     const reset = () => {
         setName("");
         setNumber("");
-        setId("");
     };
 
     const handleSubmit = (event) => {
@@ -27,14 +23,13 @@ const Form = () => {
     }
 
         const checkName = contacts.find((element) => element.name === name);
-        checkName === undefined ? dispatch(add({ name, number, id })) : alert(`${name} is already in contacts!`);
+        checkName === undefined ? createContact({ name, number }) : alert(`${name} is already in contacts!`);
         event.preventDefault();
         reset();
     };
 
     const handleInputChange = (event) => {
         setName(event.currentTarget.value);
-        setId(nanoid());
     };
 
         return (
@@ -62,9 +57,12 @@ const Form = () => {
                     className="inputPhone"
                     maxLength="16"
                     />
-                <ButtonSubmit onSubmit={handleSubmit}>Add contact</ButtonSubmit>
+                <ButtonSubmit disabled={isLoading} onSubmit={handleSubmit}>
+                    {isLoading && <TailSpin color="#ffffff" width="16" height="16" />}
+                    Add contact
+                </ButtonSubmit>
             </FormContainer>
         );
-    }
+    };
 
 export default Form;
